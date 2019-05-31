@@ -3,12 +3,29 @@
     <v-container>
       <v-layout wrap align-center justify-center row fill-height>
         <v-flex md6 xs12 ref="videobox">
-          <video
-            ref="video"
-            autoplay
-            loop
-            style="transform: scaleX(-1)"
-          ></video>
+          <div class="video-box" v-show="isVideoRender">
+            <video
+              ref="video"
+              loop
+              :autoplay="isFaceRecognitionStart"
+              @click="toggleFaceEmotionRecognition"
+            ></video>
+
+            <v-btn
+              dark
+              v-if="isVideoRender && !isFaceRecognitionStart"
+              @click.end="toggleFaceEmotionRecognition"
+              fab
+              flat
+              large
+              :style="{
+                top: (videoElem.width * 9) / 32 - 36 + 'px',
+                left: videoElem.width / 2 - 36 + 'px'
+              }"
+            >
+              <v-icon dark>play_circle_outline</v-icon>
+            </v-btn>
+          </div>
           <canvas ref="canvas" style="display: none"></canvas>
           <canvas ref="draw" style="display: none"></canvas>
           <canvas ref="image" style="display: none"></canvas>
@@ -16,9 +33,9 @@
             <v-layout wrap align-center justify-center row fill-height>
               <v-flex md4 v-for="(imgsrc, idx) in personImage" :key="idx">
                 <v-img
-                  :src="imgsrc"
                   width="160"
                   height="160"
+                  :src="imgsrc"
                   style="margin: auto; transform: scaleX(-1);"
                   :style="{ border: 'solid 5px ' + colorList[idx] }"
                 />
@@ -26,7 +43,7 @@
             </v-layout>
           </v-container>
         </v-flex>
-        <v-flex md6 xs12>
+        <v-flex md6 xs12 v-show="isVideoRender">
           <RaderChart
             :chartData="chartData"
             :chartOption="chartOption"
@@ -34,9 +51,22 @@
         </v-flex>
       </v-layout>
     </v-container>
-    <v-btn @click.end="toggleFaceEmotionRecognition">おしてね</v-btn>
   </div>
 </template>
+
+<style scoped>
+.video-box {
+  position: relative;
+}
+.video-box .v-btn {
+  position: absolute;
+}
+video {
+  transform: scaleX(-1);
+  border: solid 5px rgb(100, 100, 100);
+  background-color: rgba(100, 100, 100, 0.3);
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
@@ -57,6 +87,8 @@ import RaderChart from "@/components/RaderChart.vue";
   }
 })
 export default class FaceEmotionDemo extends Vue {
+  public videoElem?: HTMLVideoElement;
+  public isVideoRender: boolean = false;
   public personImage: string[] = [];
   public isFaceRecognitionStart: boolean = false;
   public colorList: string[] = [
@@ -102,19 +134,39 @@ export default class FaceEmotionDemo extends Vue {
       video: { facingMode: "user" }
     });
     const stream = await deviceNav;
-    const video = <HTMLVideoElement>this.$refs.video;
+    this.videoElem = <HTMLVideoElement>this.$refs.video;
     const videoBox = <HTMLVideoElement>this.$refs.videobox;
-    video.srcObject = stream;
-    video.width = videoBox.clientWidth;
+    this.videoElem.srcObject = stream;
+    this.videoElem.width = videoBox.clientWidth;
+    this.isVideoRender = true;
+  }
+
+  beforeDestroy() {
+    if (this.videoElem) {
+      let stream: any = this.videoElem.srcObject;
+      let tracks: any = stream.getTracks();
+
+      tracks.forEach((track: any) => {
+        track.stop();
+      });
+
+      this.videoElem.srcObject = null;
+    }
   }
 
   // btnAction
   public toggleFaceEmotionRecognition(): void {
     if (this.isFaceRecognitionStart) {
       this.isFaceRecognitionStart = false;
+      if (this.videoElem) {
+        this.videoElem.pause();
+      }
     } else {
       this.isFaceRecognitionStart = true;
-      this.faceEmotionRecognitionPerSec();
+      if (this.videoElem) {
+        this.videoElem.play();
+        this.faceEmotionRecognitionPerSec();
+      }
     }
   }
 

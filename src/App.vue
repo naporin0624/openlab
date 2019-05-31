@@ -1,25 +1,35 @@
 <template>
   <v-app>
-    <v-toolbar app>
+    <v-toolbar app color="#FFC107" flat>
       <v-toolbar-title class="headline text-uppercase">
-        <span>Vuetify</span>
-        <span class="font-weight-light">MATERIAL DESIGN</span>
+        <span to="/">Open Lab</span>
+        <span class="font-weight-light">Welcome to Numalab...</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn
-        flat
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-      >
-        <span class="mr-2">Latest Release</span>
+      <v-btn flat to="/">
+        <span class="mr-2">Home</span>
+      </v-btn>
+      <v-btn flat to="/face-emotion">
+        <span class="mr-2">DEMO1</span>
       </v-btn>
     </v-toolbar>
 
     <v-content>
-      <router-view></router-view>
+      <transition>
+        <router-view></router-view>
+      </transition>
     </v-content>
   </v-app>
 </template>
+
+<style scoped>
+.v-enter-active {
+  transition: opacity 1.5s;
+}
+.v-enter {
+  opacity: 0;
+}
+</style>
 
 <script>
 export default {
