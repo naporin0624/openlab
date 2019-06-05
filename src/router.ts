@@ -2,7 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
 import FaceEmotionDemo from "@/views/FaceEmotionDemo.vue";
-
+import MqttGraphDemo from "@/views/MqttGraph.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -18,6 +18,11 @@ export default new Router({
       path: "/face-emotion",
       name: "face-emotion",
       component: FaceEmotionDemo
+    },
+    {
+      path: "/mqtt-graph",
+      name: "mqtt-graph",
+      component: MqttGraphDemo
     },
     {
       path: "/about",
