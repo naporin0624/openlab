@@ -11,7 +11,7 @@
     "@types/chart.js": "^2.7.53",
     "@types/mqtt": "^2.5.0",
     "axios": "^0.18.0",
-    "chart.js": "^2.8.0",
+    "chart.js": "^2.9.4",
     "core-js": "^2.6.5",
     "mows": "0.0.6",
     "mqtt": "^3.0.0",
